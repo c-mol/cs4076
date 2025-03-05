@@ -1,0 +1,485 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
+package org.openjfx.testing;
+import javafx.application.Application;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.TextField;
+import javafx.stage.Stage;
+
+import java.io.*;
+import java.net.Socket;
+import java.util.ArrayList;
+import java.util.Scanner;
+import javafx.beans.value.ObservableValue;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
+import javafx.scene.control.Spinner;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.Border;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.BorderStroke;
+import javafx.scene.layout.BorderStrokeStyle;
+import javafx.scene.layout.BorderWidths;
+import javafx.scene.layout.CornerRadii;
+import javafx.scene.layout.GridPane;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+
+public class Client extends Application {
+    
+    public boolean stopflagraised=false;
+    private static final String SERVER_ADDRESS = "localhost";
+    private static final int SERVER_PORT = 12345;
+
+    public static void main(String[] args) {
+        launch(args);
+    }
+
+    @Override
+    @SuppressWarnings("empty-statement")
+    public void start(Stage primaryStage)// throws FileNotFoundException
+            
+    {   ArrayList<Button> btns=new   ArrayList<Button>();
+        ArrayList<TextField> txts=new   ArrayList<TextField>();
+
+        
+        String[] daysofweek={"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" , "Sunday"}; 
+        TextField module=new TextField();
+        Label modulelab=new Label("moduleCode: ");
+        txts.add(module);
+        TextField moduler=new TextField();
+        Label modulelabr=new Label("moduleCode: ");
+        txts.add(moduler);
+
+        
+        
+        
+       
+        GridPane home = new GridPane();
+        GridPane addpane = new GridPane();
+        GridPane removepane = new GridPane();
+        GridPane schedulepane = new GridPane();
+        //home
+        Label Labelhome=new Label();
+        BorderPane h=new BorderPane(home);
+        h.setStyle("-fx-background-color: linear-gradient(to top,#eae6da ,#79c752);");
+        //home.setStyle( "-fx-background-color: white;");
+        AnchorPane a=new AnchorPane(addpane);
+        a.setStyle("-fx-background-color: linear-gradient(to top,#eae6da ,#79c752);");
+        AnchorPane r=new AnchorPane(removepane);
+        r.setStyle("-fx-background-color: linear-gradient(to top,#eae6da ,#79c752);");
+        AnchorPane s=new AnchorPane(schedulepane);
+        s.setStyle("-fx-background-color: linear-gradient(to top,#eae6da ,#79c752);");
+        
+        
+        
+       
+        
+        //BorderPane.setMargin(list, new Insets(12,12,12,12));
+
+        TabPane tabPane = new TabPane();
+        Tab Add = new Tab("add",a);
+        Add.setStyle("-fx-background-color:#79c752");
+        Tab Remove = new Tab("Remove",r);
+        Remove.setStyle("-fx-background-color:#79c752");
+        Tab schedule = new Tab("schedule",s);
+        schedule.setStyle("-fx-background-color:#79c752");
+
+
+        ChoiceBox action = new ChoiceBox();
+        action.getItems().add("Add a Lecture");
+        action.getItems().add("Remove a Lecture");
+        action.getItems().add("Display Schedule");
+        action.getItems().add("Others");
+        //Tab home=new Tab();
+        Button go = new Button("go");
+        go.setOnAction(event -> {
+        String oppick=(String) action.getValue();
+        if(oppick!=null){
+        //pickdate hours mins room get values
+        if(oppick.equals("Display Schedule")){
+           tabPane.getTabs().add(schedule); }
+        else if(oppick.equals("Add a Lecture")){
+        tabPane.getTabs().add(Add);}
+        else if(oppick.equals("Remove a Lecture")){
+           tabPane.getTabs().add(Remove); 
+        }
+        }
+        });
+        btns.add(go);
+        
+        Button stoph = new Button("stop");
+        stoph.setOnAction(event -> {
+                sendMessageToServer("stop");
+                
+                primaryStage.close();
+            }
+        );
+        
+        btns.add(stoph);
+
+        addpane.addRow(0,modulelab ,module);
+        removepane.addRow(0,modulelabr ,moduler);
+
+        home.addRow(2,action ,go);
+        home.addRow(3, stoph);
+        Tab hometab = new Tab("Home");
+        hometab.setContent(h);
+        hometab.setStyle("-fx-background-color:#79c752");
+
+        tabPane.getTabs().add(hometab);
+        
+        // Text field for the user to enter the message
+        //date,time,androomnumber 
+        Label pickdaylabel=new Label("Day: ");
+        ChoiceBox pickdate=new ChoiceBox();
+        for(String d:daysofweek){
+        pickdate.getItems().add(d);
+                }
+        //hours
+        Label hourslabel=new Label("hour of lecture: ");
+        Spinner<Integer> hours=new Spinner<Integer>(900,1700,9,100);
+        
+        //mins
+        //Label minslabel=new Label("mins: ");
+        //Spinner<Integer> mins=new Spinner<Integer>(0,59,0);
+        Label roomlabel=new Label("room: ");
+        //room number
+        ChoiceBox room = new ChoiceBox();
+        try{
+        Scanner roomlist = new Scanner(new File("src/Roomlist.csv"));
+	//roomlist.nextLine();
+	while(roomlist.hasNext()) {
+	room.getItems().add((String)(roomlist.nextLine()));
+	
+        }
+        }catch(FileNotFoundException e){e.printStackTrace();}
+        
+        
+        Button stop = new Button("stop");
+        stop.setOnAction(event -> {
+                sendMessageToServer("stop");
+                
+                primaryStage.close();
+            }
+        );
+        btns.add(stop);
+
+        
+        Label x=new Label();
+        Button Submit = new Button("Submit");
+        Submit.setOnAction(event -> {
+        x.setText((String) action.getValue());
+        String oppick=(String) action.getValue();
+        //pickdate hours mins room get values
+        if((oppick.equals("Add a Lecture"))||(oppick.equals("Remove a Lecture"))
+                &&(pickdate.getValue()!=null&&hours.getValue()!=null&&room.getValue()!=null)){
+        sendMessageToServer(oppick+"£"+module.getText()+"£"+pickdate.getValue()+"£"+hours.getValue()+"£"+room.getValue());
+        }
+        });
+        btns.add(Submit);
+
+        
+
+        
+        // Layout for the scene
+        
+        addpane.addRow(1,pickdaylabel,pickdate);
+        addpane.addRow(2,hourslabel,hours);
+        //addpane.addRow(2,minslabel,mins);
+        addpane.addRow(3,roomlabel,room);
+        addpane.addRow(4,x,Submit);
+        addpane.addRow(5, stop);
+        
+        
+        // Text field for the user to enter the message
+        //date,time,androomnumber 
+        Label pickdaylabelr=new Label("Day: ");
+        ChoiceBox pickdater=new ChoiceBox();
+        for(String d:daysofweek){
+        pickdater.getItems().add(d);
+                }
+        
+        
+        //hours
+        Label hourslabelr=new Label("hours: ");
+        Spinner<Integer> hoursr=new Spinner<Integer>(900,1700,900,100);
+        //mins
+        
+        Label roomlabelr=new Label("room: ");
+        //room number
+        ChoiceBox roomr = new ChoiceBox();
+        try{
+        Scanner roomlist = new Scanner(new File("src/Roomlist.csv"));
+	//roomlist.nextLine();
+	while(roomlist.hasNext()) {
+	roomr.getItems().add((String)(roomlist.nextLine()));
+	
+        }
+        }catch(FileNotFoundException e){e.printStackTrace();}
+        
+        
+        Button stopremove = new Button("stop");
+        stopremove.setOnAction(event -> {
+                sendMessageToServer("stop");
+                
+                primaryStage.close();
+            }
+        );
+        btns.add(stopremove);
+        
+        Label xr=new Label();
+        
+        Button Submitr = new Button("Submit");
+        Submitr.setOnAction(event -> {
+        x.setText((String) action.getValue());
+        String oppick="Remove a Lecture";
+        //pickdate hours mins room get values
+        if((pickdate.getValue()!=null&&hours.getValue()!=null&&room.getValue()!=null)){
+        sendMessageToServer(oppick+"£"+module.getText()+"£"+pickdate.getValue()+"£"+hours.getValue()+"£"+room.getValue());
+        }
+        });
+        btns.add(Submitr);
+
+        removepane.addRow(1,pickdaylabelr,pickdater);
+        removepane.addRow(2,hourslabelr,hoursr);
+        removepane.addRow(3,roomlabelr,roomr);
+        removepane.addRow(4,xr,Submitr);
+        removepane.addRow(5, stopremove);
+        //displayscedule
+        Button stopsced = new Button("stop");
+        stopsced.setOnAction(event -> {
+                sendMessageToServer("stop");
+                
+                primaryStage.close();
+            }
+        );
+        btns.add(stopsced);
+
+        TextField classyear=new TextField();
+        txts.add(classyear);
+
+        Button display = new Button("Display");
+        GridPane timetable=new GridPane();
+
+        
+        display.setOnAction(new EventHandler<ActionEvent>() {
+        @Override
+        public void handle(ActionEvent event) {
+            timetable.getChildren().clear();
+            x.setText((String) action.getValue());
+            //String oppick=(String) action.getValue();
+            //pickdate hours mins room get values
+            if((!classyear.getText().equals(""))){
+               String schedule= sendMessageToServer("Display Schedule"+"£"+classyear.getText());
+               String[] x=schedule.split("!");
+               
+               String[] nine=x[0].split("£");
+               String[] ten=x[1].split("£");
+               String[] eleven=x[2].split("£");
+               String[] twelve=x[3].split("£");
+               String[] one=x[4].split("£");
+               String[] two=x[5].split("£");
+               String[] three=x[6].split("£");
+               String[] four=x[7].split("£");
+               String[] five=x[8].split("£");
+               
+               for(int i2=0; i2<7; i2++){
+                    Labels(timetable,daysofweek[i2], i2, 3);
+                    if(!nine[i2].equalsIgnoreCase("null")){
+                    Labels(timetable,format(nine[i2]), i2, 4);}
+                    else{Labels(timetable,"", i2, 4);}
+                    
+                    if(!ten[i2].equalsIgnoreCase("null")){
+                    Labels(timetable,ten[i2], i2, 5);}
+                     else{Labels(timetable,"", i2, 5);}
+                    
+                    if(!eleven[i2].equalsIgnoreCase("null")){
+                    Labels(timetable,eleven[i2], i2, 6);}
+                     else{Labels(timetable,"", i2, 6);}
+                    
+                    if(!twelve[i2].equalsIgnoreCase("null")){
+                    Labels(timetable,format(twelve[i2]), i2, 7);}
+                    else{Labels(timetable,"", i2, 7);}
+                    
+                    if(!one[i2].equalsIgnoreCase("null")){
+                    Labels(timetable,one[i2], i2, 8);}
+                    else{Labels(timetable,"", i2, 8);}
+
+                    if(!two[i2].equalsIgnoreCase("null")){
+                    Labels(timetable,two[i2], i2, 9);}
+                    else{Labels(timetable,"", i2, 9);}
+
+                    if(!three[i2].equalsIgnoreCase("null")){
+                    Labels(timetable,three[i2], i2, 10);}
+                    else{Labels(timetable,"", i2, 10);}
+                    
+                    if(!four[i2].equalsIgnoreCase("null")){
+                    Labels(timetable,four[i2], i2, 11);}
+                    else{Labels(timetable,"", i2, 11);}
+
+                    if(!five[i2].equalsIgnoreCase("null")){
+                    Labels(timetable,five[i2], i2, 12);}
+                    else{Labels(timetable,"", i2, 12);}
+        }//timetable.setGridLinesVisible(true);
+            }
+            
+        }
+    });
+        
+        btns.add(display);
+
+        timetable.setMinWidth(450.0);
+        timetable.setMinHeight(200.0);
+        timetable.setPrefWidth(100.0);
+        timetable.setVgap(5); 
+        timetable.setHgap(5);
+       // timetable.setStyle("-fx-background-color: palegreen;");
+      
+        
+        
+        
+        schedulepane.addRow(0,classyear,display);
+        schedulepane.addRow(1,timetable);
+        schedulepane.addRow(2,stopsced);
+        
+        primaryStage.widthProperty().addListener((obs, oldVal, newVal) -> {
+        resizeWidth(txts,btns, oldVal, newVal);
+        });
+
+        primaryStage.heightProperty().addListener((obs, oldVal, newVal) -> {
+        resizeHeight(txts,btns, oldVal, newVal);
+        });
+        
+       
+
+        
+        stoph.setStyle("-fx-background-color: red;" +
+                        "-fx-text-fill: white;\n" 
+                 
+                        );
+        stoph.getStyleClass().add("stbut");
+        stop.setStyle("-fx-background-color: red;" +
+                        "-fx-text-fill: white;\n" ); 
+        stopremove.setStyle("-fx-background-color: red;" +
+                            "-fx-text-fill: white;\n" );
+        stopsced.setStyle("-fx-background-color: red;" +
+                        "-fx-text-fill: white;\n" ); 
+        timetable.getStyleClass().add("timetable"); 
+        addpane.setAlignment(Pos.CENTER);
+        removepane.setAlignment(Pos.CENTER);
+        home.setAlignment(Pos.CENTER);
+        schedulepane.setAlignment(Pos.CENTER);
+        timetable.setAlignment(Pos.CENTER);
+        timetable.setHgap(5);
+        timetable.setVgap(5);
+
+        Scene scene = new Scene(tabPane, 600, 400);
+        
+        primaryStage.setTitle("Client");
+        primaryStage.setScene(scene);
+        primaryStage.show();
+    }
+   
+
+        
+
+    public void Labels(GridPane timetable,String labelname, int columnIndex, int rowIndex) {
+            Label label = new Label();
+             String daysofweek="MondayTuesdayWednesdayThursdayFridaySaturdaySunday"; 
+            //gridPane.setColumnIndex(label, columnIndex);
+            //gridPane.setRowIndex(label, rowIndex);
+            timetable.add(label, columnIndex, rowIndex);
+            label.setId(labelname+columnIndex);
+            label.setVisible(true);
+            
+            //label.setId(null+columnIndex);
+            //System.out.print(labelname+columnIndex);
+            if(//labelname.equalsIgnoreCase("Monday")
+                  daysofweek.contains(labelname)   ){
+            label.setFont(Font.font(null, FontWeight.BOLD,14));
+            label.setText(labelname);
+            }else{
+            //label.setBackground(new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)));
+            //label.setBorder(new Border(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)));
+            label.setText(labelname);
+            label.setAlignment(Pos.CENTER);
+            }
+            //label.setBorder(new Border(new BorderStroke(Color.GREEN, BorderStrokeStyle.SOLID, null, new BorderWidths(2))));
+
+    }
+    public String format(String s) {
+        String[] arrs=s.split(",");
+        String temp="";
+        if(arrs.length==4){
+        temp=arrs[2]+"\n"+arrs[0]+"\n"+arrs[3]+"\n";
+        }
+        s=temp;
+        return s;
+    }
+    
+
+    private String sendMessageToServer(String message) {
+        
+    if(!stopflagraised){
+        try (Socket socket = new Socket(SERVER_ADDRESS, SERVER_PORT);
+             PrintWriter writer = new PrintWriter(socket.getOutputStream(), true)) 
+        {
+            // Send the message to the server
+            
+            
+            writer.println(message);
+            System.out.println("Message sent to server: " + message);
+
+            // Optionally, read response from server
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
+                String response = reader.readLine();
+                System.out.println("Server response: " + response);
+                
+                return response;
+                
+            }
+            
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    return "";
+    }
+
+    private void resizeWidth(ArrayList<TextField> txts,ArrayList<Button> btns, Number oldVal, Number newVal) {
+    for(Button b:btns){
+    b.setMaxWidth(144);
+    b.setMinWidth(144);
+    }
+    for(TextField t:txts){
+    t.setMaxWidth(200);
+    t.setMinWidth((double) newVal/10);
+
+    }
+    }
+    private void resizeHeight(ArrayList<TextField> txts,ArrayList<Button> btns, Number oldVal, Number newVal) {
+    for(Button b:btns){
+    b.setMaxHeight(72);
+    b.setMinHeight(42);
+    b.setPrefHeight((double) newVal/10);
+    }
+    for(TextField t:txts){
+    t.setMaxHeight(72);
+    t.setMinHeight(42);
+    }
+    }
+}
