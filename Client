@@ -10,15 +10,14 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Arrays;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 /**
@@ -70,25 +69,13 @@ public class Client extends Application {
         home.setStyle("-fx-background-color: linear-gradient(to top,#eae6da ,#79c752);");
         //home.setStyle( "-fx-background-color: white;");
         
-        addpane.setStyle("-fx-background-color: linear-gradient(to top,#eae6da ,#79c752);");
-        removepane.setStyle("-fx-background-color: linear-gradient(to top,#eae6da ,#79c752);");
-        schedulepane.setStyle("-fx-background-color: linear-gradient(to top,#eae6da ,#79c752);");
+       // addpane.setStyle("-fx-background-color: linear-gradient(to top,#eae6da ,#79c752);");
+        //removepane.setStyle("-fx-background-color: linear-gradient(to top,#eae6da ,#79c752);");
+        //schedulepane.setStyle("-fx-background-color: linear-gradient(to top,#eae6da ,#79c752);");
         
         
         
-       
-        
-        //BorderPane.setMargin(list, new Insets(12,12,12,12));
-
-        TabPane tabPane = new TabPane();
-        Tab Add = new Tab("add",addpane);
-        Add.setStyle("-fx-background-color:#79c752");
-        Tab Remove = new Tab("Remove",removepane);
-        Remove.setStyle("-fx-background-color:#79c752");
-        Tab schedule = new Tab("schedule",schedulepane);
-        schedule.setStyle("-fx-background-color:#79c752");
-
-
+        Pane pane=new Pane(home);
         ChoiceBox action = new ChoiceBox();
         action.getItems().add("Add a Lecture");
         action.getItems().add("Remove a Lecture");
@@ -96,26 +83,54 @@ public class Client extends Application {
         action.getItems().add("Others");
         //Tab home=new Tab();
         Button go = new Button("go");
-        go.setOnAction(event -> {
-        String oppick=(String) action.getValue();
-        if(oppick!=null){
-            //pickdate hours mins room get values
-            switch (oppick) {
-                case "Display Schedule":
-                    tabPane.getTabs().add(schedule);
-                    break;
-                case "Add a Lecture":
-                    tabPane.getTabs().add(Add);
-                    break;
-                case "Remove a Lecture":
-                    tabPane.getTabs().add(Remove);
-                    break;
-                default:
-                    break;
+        go.setOnAction((ActionEvent event) -> {
+            String oppick=(String) action.getValue();
+            if(oppick!=null){
+                //pickdate hours mins room get values
+                switch (oppick) {
+                    case "Display Schedule":
+                        //tabPane.getTabs().add(schedule);
+                        pane.getChildren().clear();
+                        pane.getChildren().add(schedulepane);
+                        break;
+                    case "Add a Lecture":
+                        //tabPane.getTabs().add(Add);
+                        pane.getChildren().clear();
+                        pane.getChildren().add(addpane);
+                        break;
+                    case "Remove a Lecture":
+                        //tabPane.getTabs().add(Remove);
+                        pane.getChildren().clear();
+                        pane.getChildren().add(removepane);
+                        break;
+                    default:
+                        break;
+                }
             }
-        }
-        });
+    });
         btns.add(go);
+        
+        Button Homebuttona = new Button("home");
+        Homebuttona.setOnAction((ActionEvent event) -> {
+                        //tabPane.getTabs().add(schedule);
+                        pane.getChildren().clear();
+                        pane.getChildren().add(home);
+                       
+    });
+        Button Homebuttonr = new Button("home");
+        Homebuttonr.setOnAction((ActionEvent event) -> {
+                        //tabPane.getTabs().add(schedule);
+                        pane.getChildren().clear();
+                        pane.getChildren().add(home);
+                       
+    });
+         Button Homebuttons = new Button("home");
+        Homebuttons.setOnAction((ActionEvent event) -> {
+                        //tabPane.getTabs().add(schedule);
+                        pane.getChildren().clear();
+                        pane.getChildren().add(home);
+                       
+    });
         
         Button stoph = new Button("stop");
         stoph.setOnAction(event -> {
@@ -132,14 +147,10 @@ public class Client extends Application {
 
         home.addRow(2,action ,go);
         home.addRow(3, stoph);
-        Tab hometab = new Tab("Home");
-        hometab.setContent(home);
-        hometab.setStyle("-fx-background-color:#79c752");
+        //Tab hometab = new Tab("Home");
+        //hometab.setContent(home);
+        //hometab.setStyle("-fx-background-color:#79c752");
 
-        tabPane.getTabs().add(hometab);
-        
-        // Text field for the user to enter the message
-        //date,time,androomnumber 
         Label pickdaylabel=new Label("Day: ");
         ChoiceBox pickdate=new ChoiceBox();
         pickdate.getItems().addAll(Arrays.asList(daysofweek));//Adds days of the week to the pick date.
@@ -147,9 +158,6 @@ public class Client extends Application {
         Label hourslabel=new Label("hour of lecture: ");
         Spinner<Integer> hours=new Spinner<>(900,1700,9,100);
         
-        //mins
-        //Label minslabel=new Label("mins: ");
-        //Spinner<Integer> mins=new Spinner<Integer>(0,59,0);
         Label roomlabel=new Label("room: ");
         //room number
         
@@ -181,15 +189,13 @@ public class Client extends Application {
         btns.add(Submit);
 
         
-
-        
         // Layout for the scene
         
         addpane.addRow(1,pickdaylabel,pickdate);
         addpane.addRow(2,hourslabel,hours);
         addpane.addRow(3,roomlabel,room);
         addpane.addRow(4,x,Submit);
-        addpane.addRow(5, stop);
+        addpane.addRow(5, stop,Homebuttona);
         
         
         // Text field for the user to enter the message
@@ -236,7 +242,7 @@ public class Client extends Application {
         removepane.addRow(2,hourslabelr,hoursr);
         removepane.addRow(3,roomlabelr,roomr);
         removepane.addRow(4,xr,Submitr);
-        removepane.addRow(5, stopremove);
+        removepane.addRow(5, stopremove,Homebuttonr);
         //displayscedule
         Button stopsced = new Button("stop");
         stopsced.setOnAction(event -> {
@@ -326,8 +332,8 @@ public class Client extends Application {
         
         schedulepane.addRow(0,classyear,display);
         schedulepane.addRow(1,timetable);
-        schedulepane.addRow(2,stopsced);
-        
+        schedulepane.addRow(2,stopsced,Homebuttons);
+        /*
         primaryStage.widthProperty().addListener((obs, oldVal, newVal) -> {
         resizeWidth(txts,btns, newVal);
         });
@@ -335,7 +341,7 @@ public class Client extends Application {
         primaryStage.heightProperty().addListener((obs, oldVal, newVal) -> {
         resizeHeight(txts,btns, newVal);
         });
-        
+        */
        
 
         
@@ -359,7 +365,7 @@ public class Client extends Application {
         timetable.setHgap(5);
         timetable.setVgap(5);
 
-        Scene scene = new Scene(tabPane, 600, 400);
+        Scene scene = new Scene(pane, 600, 400);
         
         primaryStage.setTitle("Client");
         primaryStage.setScene(scene);
