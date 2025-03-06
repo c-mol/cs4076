@@ -1,11 +1,14 @@
-package org.openjfx.testing;
+
+package org.openjfx.project4076proto;
 
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Scanner;
-
+/**
+ * 
+ */
 public class Server {
     public boolean stopflagraised=false;
     private static final int PORT = 12345;
@@ -14,7 +17,15 @@ public class Server {
         new Server().startServer();
     }
     //sendMessageToServer(oppick+"£"+mod+"£"+pickdate.getValue()+"£"+hours.getValue()+"£"+room.getValue());
-
+    
+    /**
+     * 
+     * takes the information for what to add to the and checks if it clashes with anything in the csv schedule file
+     * if clash return the clash message otherwise adds it to the csvfile
+     * @param li info to be added to the module
+     * @return String clash message/done message
+     * @throws java.io.IOException 
+     */
     public String addlecture(String[] li) throws IOException{
      String writein=li[1]+","+li[2]+","+li[3]+","+li[4];
      System.out.print(writein);
@@ -32,11 +43,13 @@ public class Server {
     w.close();
     return "done";
     }
-    
-    }/*A clash can occur if the room 
-      is occupied at requested time 
-      * and-or course student (LM051-2026)have another module’s lecture at that time.
-	*/
+    }
+    /**
+     * @param writein
+     * Checks if there is already a class in this room at that time.
+     * returns true/false
+     * @return Boolean
+     */
     public boolean clashingWithOtherModule(String writein) throws FileNotFoundException {
     Scanner scan = new Scanner(new File("src/scedule.csv"));
     String[] toadd = writein.split(",");
@@ -55,7 +68,13 @@ public class Server {
     return false;
 }
     //sendMessageToServer(oppick+"£"+mod+"£"+pickdate.getValue()+"£"+hours.getValue()+"£"+room.getValue());
-
+    
+    /**
+     * @param writein
+     * Checks if a student has a module at this time
+     * returns true/false
+     * @return Boolean
+     */
     public boolean clashingStudentHasTwoModules(String writein) throws FileNotFoundException {
     Scanner scansched = new Scanner(new File("src/scedule.csv"));
     
@@ -79,8 +98,14 @@ public class Server {
     return false;
 
     }
+    /**
+     * @param module
+     * Gets all the classes that take this module.
+     * @return  ArrayList<String>
+     * @throws java.io.FileNotFoundException
+     */
     public ArrayList<String> findClassesThatTakeThisModule(String module) throws FileNotFoundException{
-    ArrayList<String> classesthattakethismodule=new ArrayList<String>();
+    ArrayList<String> classesthattakethismodule=new ArrayList<>();
     Scanner scanclassinyear = new Scanner(new File("src/classyearinmod.csv"));
     String[] ctmoduleln;
     while(scanclassinyear.hasNext()){
@@ -92,10 +117,10 @@ public class Server {
     scanclassinyear.close();
     return classesthattakethismodule;
 }
-    
+       
     public String removelecture(String[] li) throws IOException{
     String writein=li[1]+","+li[2]+","+li[3]+","+li[4];
-        ArrayList<String> temp = new ArrayList<String>();
+        ArrayList<String> temp = new ArrayList<>();
 		Scanner scedscan = new Scanner(new File("src/scedule.csv"));
 		
 		while(scedscan.hasNext()) {
