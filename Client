@@ -1,279 +1,484 @@
-
 package org.openjfx.project4076proto;
 
+import javafx.application.Application;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.TextField;
+import javafx.stage.Stage;
 import java.io.*;
-import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Scanner;
+import java.util.Arrays;
+import javafx.event.ActionEvent;
+import javafx.geometry.Pos;
+import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.Spinner;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 /**
  * 
  */
-public class Server {
+public class Client extends Application {
     public boolean stopflagraised=false;
-    private static final int PORT = 12345;
-
+    private static final String SERVER_ADDRESS = "localhost";
+    private static final int SERVER_PORT = 12345;
+    
+    /**launches the stage.
+     * @param args
+     */
     public static void main(String[] args) {
-        new Server().startServer();
+        launch(args);
     }
-    //sendMessageToServer(oppick+"£"+mod+"£"+pickdate.getValue()+"£"+hours.getValue()+"£"+room.getValue());
     
     /**
-     * 
-     * takes the information for what to add to the and checks if it clashes with anything in the csv schedule file
-     * if clash return the clash message otherwise adds it to the csvfile
-     * @param li info to be added to the module
-     * @return String clash message/done message
-     * @throws java.io.IOException 
+     *
+     * @param primaryStage
+     * Creates all the nodes for the GUI
+     *
      */
-    public String addlecture(String[] li) throws IOException{
-     String writein=li[1]+","+li[2]+","+li[3]+","+li[4];
-     System.out.print(writein);
-    if(clashingWithOtherModule(writein)){
-    return "scedule clash!(other module is already scheduled here at this time)";
-    }
-    else if(clashingStudentHasTwoModules(writein)){
-    return "scedule clash!(Students in a module have a class at this time)";
-    }
-    else{
-    PrintWriter w=new PrintWriter(new FileWriter("src/scedule.csv",true));
-    
-    w.print(writein);
-    w.println();
-    w.close();
-    return "done";
-    }
-    }
-    /**
-     * @param writein
-     * Checks if there is already a class in this room at that time.
-     * returns true/false
-     * @return Boolean
-     */
-    public boolean clashingWithOtherModule(String writein) throws FileNotFoundException {
-    Scanner scan = new Scanner(new File("src/scedule.csv"));
-    String[] toadd = writein.split(",");
-    while (scan.hasNext()) {
-        String input = scan.nextLine();
-        String[] inschedule = input.split(",");
-        
-         if (inschedule[3].equalsIgnoreCase(toadd[3]) // room
-                   && inschedule[1].equalsIgnoreCase(toadd[1]) // date
-                   && inschedule[2].equalsIgnoreCase(toadd[2])) { // time
-            scan.close();
-             return true;
-        }
-    }
-    scan.close();
-    return false;
-}
-    //sendMessageToServer(oppick+"£"+mod+"£"+pickdate.getValue()+"£"+hours.getValue()+"£"+room.getValue());
-    
-    /**
-     * @param writein
-     * Checks if a student has a module at this time
-     * returns true/false
-     * @return Boolean
-     */
-    public boolean clashingStudentHasTwoModules(String writein) throws FileNotFoundException {
-    Scanner scansched = new Scanner(new File("src/scedule.csv"));
-    
-    String[] writinsplit=writein.split(",");
-    ArrayList<String> classesthattakethismodule=findClassesThatTakeThisModule(writinsplit[0]);
-    String[] Alreadyinsched;
-    while(scansched.hasNext()){
-    Alreadyinsched=scansched.nextLine().split(",");
-    if ((writinsplit[1].equalsIgnoreCase(Alreadyinsched[1]))
-    && (writinsplit[2].equalsIgnoreCase(Alreadyinsched[2])))
-    {//date and time are the same as this module
-        ArrayList<String> othermodule=findClassesThatTakeThisModule(Alreadyinsched[0]);
-        for(String s:classesthattakethismodule){
-        if(othermodule.contains(s)){
-            scansched.close();
-            return true;
-        }
-        }
-        }
-    }
-    return false;
+    @Override
+    @SuppressWarnings("empty-statement")
+    public void start(Stage primaryStage)// throws FileNotFoundException
+            
+    {   ArrayList<Button> btns=new ArrayList<>();
+        ArrayList<TextField> txts=new ArrayList<>();
 
-    }
-    /**
-     * @param module
-     * Gets all the classes that take this module.
-     * @return  ArrayList<String>
-     * @throws java.io.FileNotFoundException
-     */
-    public ArrayList<String> findClassesThatTakeThisModule(String module) throws FileNotFoundException{
-    ArrayList<String> classesthattakethismodule=new ArrayList<>();
-    Scanner scanclassinyear = new Scanner(new File("src/classyearinmod.csv"));
-    String[] ctmoduleln;
-    while(scanclassinyear.hasNext()){
-     ctmoduleln=scanclassinyear.nextLine().split(",");
-    if(module.equalsIgnoreCase(ctmoduleln[0])){//module to be written in will equal the module in the class list
-       classesthattakethismodule.add(ctmoduleln[1]);
-    }
-    }
-    scanclassinyear.close();
-    return classesthattakethismodule;
-}
+        
+        String[] daysofweek={"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" , "Sunday"}; 
+        TextField module=new TextField();
+        Label modulelab=new Label("moduleCode: ");
+        txts.add(module);
+        TextField moduler=new TextField();
+        Label modulelabr=new Label("moduleCode: ");
+        txts.add(moduler);
+
+        
+        
+        
        
-    public String removelecture(String[] li) throws IOException{
-    String writein=li[1]+","+li[2]+","+li[3]+","+li[4];
-        ArrayList<String> temp = new ArrayList<>();
-		Scanner scedscan = new Scanner(new File("src/scedule.csv"));
-		
-		while(scedscan.hasNext()) {
-			String i = scedscan.nextLine();
-			
-			if((i).equalsIgnoreCase(writein))
-                         {
+        GridPane home = new GridPane();
+        GridPane addpane = new GridPane();
+        GridPane removepane = new GridPane();
+        GridPane schedulepane = new GridPane();
+        //home
+        BorderPane h=new BorderPane(home);
+        h.setStyle("-fx-background-color: linear-gradient(to top,#eae6da ,#79c752);");
+        //home.setStyle( "-fx-background-color: white;");
+        AnchorPane a=new AnchorPane(addpane);
+        a.setStyle("-fx-background-color: linear-gradient(to top,#eae6da ,#79c752);");
+        AnchorPane r=new AnchorPane(removepane);
+        r.setStyle("-fx-background-color: linear-gradient(to top,#eae6da ,#79c752);");
+        AnchorPane s=new AnchorPane(schedulepane);
+        s.setStyle("-fx-background-color: linear-gradient(to top,#eae6da ,#79c752);");
+        
+        
+        
+       
+        
+        //BorderPane.setMargin(list, new Insets(12,12,12,12));
 
-			}
-			else {temp.add(i);}
-		}
-		PrintWriter clear = new PrintWriter("src/scedule.csv");
-		for(String x:temp) {
-			PrintWriter writer = new PrintWriter(new FileWriter("src/scedule.csv",true));
-			writer.println(x);
-			writer.close();
-        
-                }
-    scedscan.close();
-    return "Lecture removed";
-    }
-    
-    private String findschedulefordateandmod(String[] splitMessage) throws FileNotFoundException {
-    //sendMessageToServer("Display Schedule"+"£"+classyear.getText());
-    String[] monday=new String[9];
-    String[] tuesday=new String[9];
-    String[] wednesday=new String[9];
-    String[] thursday=new String[9];
-    String[] friday=new String[9];
-    String[] saturday=new String[9];
-    String[] sunday=new String[9];
-    //String[] schedarr=new String[70];
-    
-    ArrayList<String> modules=getModules(splitMessage[1]);//moduels class takes
-    //mod day hrs room
-    int x=0;
-    String Schedule="";
-    Scanner scedscan = new Scanner(new File("src/scedule.csv"));
-    while(scedscan.hasNext()){
-    String input=scedscan.nextLine();
-    String[] CheckinScedule=input.split(",");
-    if(modules.contains(CheckinScedule[0])){
-        //this is a module taken by this class
-        if(CheckinScedule[1].equalsIgnoreCase("monday"))
-        {monday[(Integer.parseInt(CheckinScedule[2])-900)/100]=input;}
-        else if(CheckinScedule[1].equalsIgnoreCase("tuesday"))
-        {tuesday[(Integer.parseInt(CheckinScedule[2])-900)/100]=input;}
-        
-        else if(CheckinScedule[1].equalsIgnoreCase("wednesday"))
-        {wednesday[(Integer.parseInt(CheckinScedule[2])-900)/100]=input;}
-        
-        else if(CheckinScedule[1].equalsIgnoreCase("thursday"))
-        {thursday[(Integer.parseInt(CheckinScedule[2])-900)/100]=input;}
-        
-        else if(CheckinScedule[1].equalsIgnoreCase("friday"))
-        {friday[(Integer.parseInt(CheckinScedule[2])-900)/100]=input;}
-        else if(CheckinScedule[1].equalsIgnoreCase("saturday"))
-        {saturday[(Integer.parseInt(CheckinScedule[2])-900)/100]=input;}
-        else if(CheckinScedule[1].equalsIgnoreCase("sunday"))
-        {sunday[(Integer.parseInt(CheckinScedule[2])-900)/100]=input;}
-        
-    }
-    }
-    
-    for(int i=0;i<9;i++){
-    //Schedule+="!";
-    Schedule+=monday[i]+"£";
-    Schedule+=tuesday[i]+"£";
-    Schedule+=wednesday[i]+"£";
-    Schedule+=thursday[i]+"£";
-    Schedule+=wednesday[i]+"£";
-    Schedule+=friday[i]+"£";
-    Schedule+=saturday[i]+"£";
-    Schedule+=sunday[i]+"£";
-    Schedule+="!";
-    }
-    return Schedule;
-    }
-    
-    public ArrayList<String> getModules(String classyear) throws FileNotFoundException{
-    ArrayList<String> modulesinclass=new ArrayList<String>();
-    Scanner scanclassinyear = new Scanner(new File("src/classyearinmod.csv"));
-    String[] ctmoduleln;
-    while(scanclassinyear.hasNext()){
-     ctmoduleln=scanclassinyear.nextLine().split(",");
-    if(classyear.equalsIgnoreCase(ctmoduleln[1])){//module to be written in will equal the module in the class list
-       modulesinclass.add(ctmoduleln[0]);//add modules
-    }
-    }
-    scanclassinyear.close();
-    return modulesinclass;
-}
-    private void startServer(){
-        try (ServerSocket serverSocket = new ServerSocket(PORT)) {
-            System.out.println("Server started, waiting for connections...");
+        TabPane tabPane = new TabPane();
+        Tab Add = new Tab("add",a);
+        Add.setStyle("-fx-background-color:#79c752");
+        Tab Remove = new Tab("Remove",r);
+        Remove.setStyle("-fx-background-color:#79c752");
+        Tab schedule = new Tab("schedule",s);
+        schedule.setStyle("-fx-background-color:#79c752");
 
-            while (true&&!stopflagraised) {
-                Socket socket = serverSocket.accept();
-                System.out.println("Client connected!");
 
-                handleClient(socket);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void handleClient(Socket socket) {
-        try (
-            BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            PrintWriter writer = new PrintWriter(socket.getOutputStream(), true)
-        ) {
-            // Continuously read messages from the client
-            String message;
-            while ((message = reader.readLine()) != null) {
-                String[] splitMessage=message.split("£");
-                if(splitMessage[0].equalsIgnoreCase("stop")){
-                stopflagraised=true;
-                System.out.println("Received: " + message);
-                message="TERMINATE";
-                writer.println(message);
-                }
-                else if(splitMessage[0].equalsIgnoreCase("Add a Lecture")){
-                System.out.println("adding lecture");
-                String comfimdoness=addlecture(splitMessage);
-                writer.println(comfimdoness);
-                }
-                else if(splitMessage[0].equalsIgnoreCase("Remove a lecture")){
-                System.out.println("removing lecture");
-                String comfimdoness= removelecture(splitMessage);
-                writer.println(comfimdoness);
-                }
-                else if(splitMessage[0].equalsIgnoreCase("Display Schedule")){
-               //sendMessageToServer("Display Schedule"+"£"+module.getText()+"£"+pickdatetodiplay.getValue());
-               //splitMessage
-                String sched=findschedulefordateandmod(splitMessage);
-                writer.println(sched);
-                }
-                else{
-                System.out.println("Received: " + message);
-                writer.println(message); }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                socket.close();
-                System.out.println("Client connection closed.");
-            } catch (IOException e) {
-                e.printStackTrace();
+        ChoiceBox action = new ChoiceBox();
+        action.getItems().add("Add a Lecture");
+        action.getItems().add("Remove a Lecture");
+        action.getItems().add("Display Schedule");
+        action.getItems().add("Others");
+        //Tab home=new Tab();
+        Button go = new Button("go");
+        go.setOnAction(event -> {
+        String oppick=(String) action.getValue();
+        if(oppick!=null){
+            //pickdate hours mins room get values
+            switch (oppick) {
+                case "Display Schedule":
+                    tabPane.getTabs().add(schedule);
+                    break;
+                case "Add a Lecture":
+                    tabPane.getTabs().add(Add);
+                    break;
+                case "Remove a Lecture":
+                    tabPane.getTabs().add(Remove);
+                    break;
+                default:
+                    break;
             }
         }
+        });
+        btns.add(go);
+        
+        Button stoph = new Button("stop");
+        stoph.setOnAction(event -> {
+                sendMessageToServer("stop");
+                
+                primaryStage.close();
+            }
+        );
+        
+        btns.add(stoph);
+
+        addpane.addRow(0,modulelab ,module);
+        removepane.addRow(0,modulelabr ,moduler);
+
+        home.addRow(2,action ,go);
+        home.addRow(3, stoph);
+        Tab hometab = new Tab("Home");
+        hometab.setContent(h);
+        hometab.setStyle("-fx-background-color:#79c752");
+
+        tabPane.getTabs().add(hometab);
+        
+        // Text field for the user to enter the message
+        //date,time,androomnumber 
+        Label pickdaylabel=new Label("Day: ");
+        ChoiceBox pickdate=new ChoiceBox();
+        pickdate.getItems().addAll(Arrays.asList(daysofweek));//Adds days of the week to the pick date.
+        //hours
+        Label hourslabel=new Label("hour of lecture: ");
+        Spinner<Integer> hours=new Spinner<>(900,1700,9,100);
+        
+        //mins
+        //Label minslabel=new Label("mins: ");
+        //Spinner<Integer> mins=new Spinner<Integer>(0,59,0);
+        Label roomlabel=new Label("room: ");
+        //room number
+        
+        TextField room = new TextField();
+       
+        
+        
+        Button stop = new Button("stop");
+        stop.setOnAction(event -> {
+                sendMessageToServer("stop");
+                
+                primaryStage.close();
+            }
+        );
+        btns.add(stop);
+
+        
+        Label x=new Label();
+        Button Submit = new Button("Submit");
+        Submit.setOnAction(event -> {
+        x.setText((String) action.getValue());
+        String oppick=(String) action.getValue();
+        //pickdate hours mins room get values
+        if((oppick.equals("Add a Lecture"))||(oppick.equals("Remove a Lecture"))
+                &&(pickdate.getValue()!=null&&hours.getValue()!=null&&room.getText()!=null)){
+        sendMessageToServer(oppick+"£"+module.getText()+"£"+pickdate.getValue()+"£"+hours.getValue()+"£"+room.getText());
+        }
+        });
+        btns.add(Submit);
+
+        
+
+        
+        // Layout for the scene
+        
+        addpane.addRow(1,pickdaylabel,pickdate);
+        addpane.addRow(2,hourslabel,hours);
+        addpane.addRow(3,roomlabel,room);
+        addpane.addRow(4,x,Submit);
+        addpane.addRow(5, stop);
+        
+        
+        // Text field for the user to enter the message
+        //date,time,and room number 
+        Label pickdaylabelr=new Label("Day: ");
+        ChoiceBox pickdater=new ChoiceBox();
+        pickdater.getItems().addAll(Arrays.asList(daysofweek));
+        
+        
+        //hours
+        Label hourslabelr=new Label("hours: ");
+        Spinner<Integer> hoursr=new Spinner<>(900,1700,900,100);
+        //mins
+        
+        Label roomlabelr=new Label("room: ");
+        //room number
+        TextField roomr = new TextField();
+     
+        
+        Button stopremove = new Button("stop");
+        stopremove.setOnAction(event -> {
+                sendMessageToServer("stop");
+                
+                primaryStage.close();
+            }
+        );
+        btns.add(stopremove);
+        
+        Label xr=new Label();
+        
+        Button Submitr = new Button("Submit");
+        Submitr.setOnAction(event -> {
+        x.setText((String) action.getValue());
+        String oppick="Remove a Lecture";
+        //pickdate hours mins room get values
+        if((pickdate.getValue()!=null&&hours.getValue()!=null&&roomr.getText()!=null)){
+        //String s=oppick+"£"+module.getText()+"£"+pickdate.getValue()+"£"+hours.getValue()+"£"+room.getText();
+        sendMessageToServer(oppick+"£"+module.getText()+"£"+pickdate.getValue()+"£"+hours.getValue()+"£"+roomr.getText());
+        }
+        });
+        btns.add(Submitr);
+
+        removepane.addRow(1,pickdaylabelr,pickdater);
+        removepane.addRow(2,hourslabelr,hoursr);
+        removepane.addRow(3,roomlabelr,roomr);
+        removepane.addRow(4,xr,Submitr);
+        removepane.addRow(5, stopremove);
+        //displayscedule
+        Button stopsced = new Button("stop");
+        stopsced.setOnAction(event -> {
+                sendMessageToServer("stop");
+                
+                primaryStage.close();
+            }
+        );
+        btns.add(stopsced);
+
+        TextField classyear=new TextField();
+        txts.add(classyear);
+
+        Button display = new Button("Display");
+        GridPane timetable=new GridPane();
+
+        
+        display.setOnAction((ActionEvent event) -> {
+            timetable.getChildren().clear();
+            x.setText((String) action.getValue());
+        //String oppick=(String) action.getValue();
+        //pickdate hours mins room get values
+        if (!classyear.getText().equals("")) {
+            String schedule1 = sendMessageToServer("Display Schedule"+"£"+classyear.getText());
+            String[] x1 = schedule1.split("!");
+            String[] nine = x1[0].split("£");
+            String[] ten = x1[1].split("£");
+            String[] eleven = x1[2].split("£");
+            String[] twelve = x1[3].split("£");
+            String[] one = x1[4].split("£");
+            String[] two = x1[5].split("£");
+            String[] three = x1[6].split("£");
+            String[] four = x1[7].split("£");
+            String[] five = x1[8].split("£");
+            for(int i2=0; i2<7; i2++){
+                Labels(timetable,daysofweek[i2], i2, 3);
+                if(!nine[i2].equalsIgnoreCase("null")){
+                    Labels(timetable,format(nine[i2]), i2, 4);}
+                else{Labels(timetable,"", i2, 4);}
+                
+                if(!ten[i2].equalsIgnoreCase("null")){
+                    Labels(timetable,ten[i2], i2, 5);}
+                else{Labels(timetable,"", i2, 5);}
+                
+                if(!eleven[i2].equalsIgnoreCase("null")){
+                    Labels(timetable,eleven[i2], i2, 6);}
+                else{Labels(timetable,"", i2, 6);}
+                
+                if(!twelve[i2].equalsIgnoreCase("null")){
+                    Labels(timetable,format(twelve[i2]), i2, 7);}
+                else{Labels(timetable,"", i2, 7);}
+                
+                if(!one[i2].equalsIgnoreCase("null")){
+                    Labels(timetable,one[i2], i2, 8);}
+                else{Labels(timetable,"", i2, 8);}
+                
+                if(!two[i2].equalsIgnoreCase("null")){
+                    Labels(timetable,two[i2], i2, 9);}
+                else{Labels(timetable,"", i2, 9);}
+                
+                if(!three[i2].equalsIgnoreCase("null")){
+                    Labels(timetable,three[i2], i2, 10);}
+                else{Labels(timetable,"", i2, 10);}
+                
+                if(!four[i2].equalsIgnoreCase("null")){
+                    Labels(timetable,four[i2], i2, 11);}
+                else{Labels(timetable,"", i2, 11);}
+                
+                if(!five[i2].equalsIgnoreCase("null")){
+                    Labels(timetable,five[i2], i2, 12);}
+                else{Labels(timetable,"", i2, 12);}
+            }//timetable.setGridLinesVisible(true);
+        }
+    });
+        
+        btns.add(display);
+
+        timetable.setMinWidth(450.0);
+        timetable.setMinHeight(200.0);
+        timetable.setPrefWidth(100.0);
+        timetable.setVgap(5); 
+        timetable.setHgap(5);
+       // timetable.setStyle("-fx-background-color: palegreen;");
+      
+        
+        
+        
+        schedulepane.addRow(0,classyear,display);
+        schedulepane.addRow(1,timetable);
+        schedulepane.addRow(2,stopsced);
+        
+        primaryStage.widthProperty().addListener((obs, oldVal, newVal) -> {
+        resizeWidth(txts,btns, newVal);
+        });
+
+        primaryStage.heightProperty().addListener((obs, oldVal, newVal) -> {
+        resizeHeight(txts,btns, newVal);
+        });
+        
+       
+
+        
+        stoph.setStyle("-fx-background-color: red;" +
+                        "-fx-text-fill: white;\n" 
+                 
+                        );
+        stoph.getStyleClass().add("stbut");
+        stop.setStyle("-fx-background-color: red;" +
+                        "-fx-text-fill: white;\n" ); 
+        stopremove.setStyle("-fx-background-color: red;" +
+                            "-fx-text-fill: white;\n" );
+        stopsced.setStyle("-fx-background-color: red;" +
+                        "-fx-text-fill: white;\n" ); 
+        timetable.getStyleClass().add("timetable"); 
+        addpane.setAlignment(Pos.CENTER);
+        removepane.setAlignment(Pos.CENTER);
+        home.setAlignment(Pos.CENTER);
+        schedulepane.setAlignment(Pos.CENTER);
+        timetable.setAlignment(Pos.CENTER);
+        timetable.setHgap(5);
+        timetable.setVgap(5);
+
+        Scene scene = new Scene(tabPane, 600, 400);
+        
+        primaryStage.setTitle("Client");
+        primaryStage.setScene(scene);
+        primaryStage.show();
+    }
+   
+
+        
+/**
+ * @param timetable a GridPane.
+ * @param labelname names to be set to labels.
+ * @param columnIndex indexes of columns.
+ * @param rowIndex indexes of rows.
+ * Gets a GridPane and creates labels to fill it with
+ */
+public void Labels(GridPane timetable,String labelname, int columnIndex, int rowIndex) {
+            Label label = new Label();
+            String daysofweek="MondayTuesdayWednesdayThursdayFridaySaturdaySunday"; 
+            //gridPane.setColumnIndex(label, columnIndex);
+            //gridPane.setRowIndex(label, rowIndex);
+            timetable.add(label, columnIndex, rowIndex);
+            label.setId(labelname+columnIndex);
+            label.setVisible(true);
+            
+            //label.setId(null+columnIndex);
+            //System.out.print(labelname+columnIndex);
+            if(//labelname.equalsIgnoreCase("Monday")
+                  daysofweek.contains(labelname)   ){
+            label.setFont(Font.font(null, FontWeight.BOLD,14));
+            label.setText(labelname);
+            }else{
+            //label.setBackground(new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)));
+            //label.setBorder(new Border(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)));
+            label.setText(labelname);
+            label.setAlignment(Pos.CENTER);
+            }
+            //label.setBorder(new Border(new BorderStroke(Color.GREEN, BorderStrokeStyle.SOLID, null, new BorderWidths(2))));
+
+    }
+/** * @param s schedule string 
+ * arranges the string to be put into the schedule
+ * @return String after it was arranged
+ * 
+ */
+    public String format(String s) {
+        String[] arrs=s.split(",");
+        String temp="";
+        if(arrs.length==4){
+        temp=arrs[2]+"\n"+arrs[0]+"\n"+arrs[3]+"\n";
+        }
+        s=temp;
+        return s;
+    }
+    /**
+     * @param message
+     * @return String
+     * creates a socket and
+     * Sends a message to the server and returns message sent back.
+     * */
+
+    private String sendMessageToServer(String message) {
+        
+    if(!stopflagraised){
+        try (Socket socket = new Socket(SERVER_ADDRESS, SERVER_PORT);
+             PrintWriter writer = new PrintWriter(socket.getOutputStream(), true)) 
+        {
+            // Send the message to the server
+            
+            
+            writer.println(message);
+            System.out.println("Message sent to server: " + message);
+
+            // Optionally, read response from server
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
+                String response = reader.readLine();
+                System.out.println("Server response: " + response);
+                
+                return response;
+                
+            }
+            
+        } catch (IOException e) {
+        }
+    }
+    return "";
+    }
+/**@patam ArrayList<TextField> 
+ * @patam ArrayList<Button>
+ * @patam newVal
+ * gets array lists and resizes them*/
+    private void resizeWidth(ArrayList<TextField> txts, ArrayList<Button> btns, Number newVal) {
+    for(Button b:btns){
+    b.setMaxWidth(144);
+    b.setMinWidth(144);
+    }
+    for(TextField t:txts){
+    t.setMaxWidth(200);
+    t.setMinWidth((double) newVal/10);
+
+    }
+    }
+    /**@patam ArrayList<TextField> 
+    * @patam ArrayList<Button>
+    * @patam newVal
+    * gets array lists and resizes them*/
+    private void resizeHeight(ArrayList<TextField> txts, ArrayList<Button> btns, Number newVal) {
+    for(Button b:btns){
+    b.setMaxHeight(72);
+    b.setMinHeight(42);
+    b.setPrefHeight((double) newVal/10);
+    }
+    for(TextField t:txts){
+    t.setMaxHeight(72);
+    t.setMinHeight(42);
+    }
     }
 
-
+ 
 }
