@@ -67,15 +67,12 @@ public class Client extends Application {
         GridPane removepane = new GridPane();
         GridPane schedulepane = new GridPane();
         //home
-        BorderPane h=new BorderPane(home);
-        h.setStyle("-fx-background-color: linear-gradient(to top,#eae6da ,#79c752);");
+        home.setStyle("-fx-background-color: linear-gradient(to top,#eae6da ,#79c752);");
         //home.setStyle( "-fx-background-color: white;");
-        AnchorPane a=new AnchorPane(addpane);
-        a.setStyle("-fx-background-color: linear-gradient(to top,#eae6da ,#79c752);");
-        AnchorPane r=new AnchorPane(removepane);
-        r.setStyle("-fx-background-color: linear-gradient(to top,#eae6da ,#79c752);");
-        AnchorPane s=new AnchorPane(schedulepane);
-        s.setStyle("-fx-background-color: linear-gradient(to top,#eae6da ,#79c752);");
+        
+        addpane.setStyle("-fx-background-color: linear-gradient(to top,#eae6da ,#79c752);");
+        removepane.setStyle("-fx-background-color: linear-gradient(to top,#eae6da ,#79c752);");
+        schedulepane.setStyle("-fx-background-color: linear-gradient(to top,#eae6da ,#79c752);");
         
         
         
@@ -84,11 +81,11 @@ public class Client extends Application {
         //BorderPane.setMargin(list, new Insets(12,12,12,12));
 
         TabPane tabPane = new TabPane();
-        Tab Add = new Tab("add",a);
+        Tab Add = new Tab("add",addpane);
         Add.setStyle("-fx-background-color:#79c752");
-        Tab Remove = new Tab("Remove",r);
+        Tab Remove = new Tab("Remove",removepane);
         Remove.setStyle("-fx-background-color:#79c752");
-        Tab schedule = new Tab("schedule",s);
+        Tab schedule = new Tab("schedule",schedulepane);
         schedule.setStyle("-fx-background-color:#79c752");
 
 
@@ -136,7 +133,7 @@ public class Client extends Application {
         home.addRow(2,action ,go);
         home.addRow(3, stoph);
         Tab hometab = new Tab("Home");
-        hometab.setContent(h);
+        hometab.setContent(home);
         hometab.setStyle("-fx-background-color:#79c752");
 
         tabPane.getTabs().add(hometab);
