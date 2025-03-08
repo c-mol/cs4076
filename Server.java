@@ -119,7 +119,8 @@ public class Server {
 }
        
     public String removelecture(String[] li) throws IOException{
-    String writein=li[1]+","+li[2]+","+li[3]+","+li[4];
+    String response="couldn't find this lecture";
+    String writein=li[1]+","+li[2]+","+li[3]+","+li[4];// Lecture�CS4012�Tuesday�900�ERB001
         ArrayList<String> temp = new ArrayList<>();
 		Scanner scedscan = new Scanner(new File("src/scedule.csv"));
 		
@@ -128,7 +129,7 @@ public class Server {
 			
 			if((i).equalsIgnoreCase(writein))
                          {
-
+                           response="lecture removed";
 			}
 			else {temp.add(i);}
 		}
@@ -140,7 +141,7 @@ public class Server {
         
                 }
     scedscan.close();
-    return "Lecture removed";
+    return response;
     }
     
     private String findschedulefordateandmod(String[] splitMessage) throws FileNotFoundException {
