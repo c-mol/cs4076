@@ -285,9 +285,9 @@ public class Client extends Application {
        // x.setText((String) action.getValue());
         String oppick="Remove a Lecture";
         //pickdate hours mins room get values
-        if((pickdate.getValue()!=null&&hours.getValue()!=null&&roomr.getText()!=null)){
+        if((pickdater.getValue()!=null&&hoursr.getValue()!=null&&roomr.getText()!=null)){
         //String s=oppick+"£"+module.getText()+"£"+pickdate.getValue()+"£"+hours.getValue()+"£"+room.getText();
-        String s=sendMessageToServer(oppick+"£"+module.getText()+"£"+pickdate.getValue()+"£"+hours.getValue()+"£"+roomr.getText());
+        String s=sendMessageToServer(oppick+"£"+moduler.getText()+"£"+pickdater.getValue()+"£"+hoursr.getValue()+"£"+roomr.getText());
         xr.setText(s);
         }
         });
