@@ -113,6 +113,16 @@ public class Client extends Application {
                         pane.getChildren().clear();
                         pane.getChildren().add(removepane);
                         break;
+                    case "Others":
+                    {
+                        try {
+                            throw new IncorrectActionException("Other option not valid");
+                        } catch (IncorrectActionException ex) {
+                            ex.printStackTrace();
+                        }
+                        }
+                        break;
+
                     default:
                         break;
                 }
@@ -584,4 +594,5 @@ public void Labels(GridPane timetable,String labelname, int columnIndex, int row
     for(Pane p:panes)
      p.setMinHeight(newVal.doubleValue());
     }
+    
 }
