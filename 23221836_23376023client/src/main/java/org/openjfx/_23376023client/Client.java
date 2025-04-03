@@ -1,3 +1,4 @@
+
 package org.openjfx._23376023client;
 
 import javafx.application.Application;

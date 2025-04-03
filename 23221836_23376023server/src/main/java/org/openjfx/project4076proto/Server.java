@@ -1,4 +1,5 @@
 
+
 package org.openjfx.project4076proto;
 
 import java.io.*;
@@ -6,145 +7,195 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javafx.application.Application;
+import javafx.event.ActionEvent;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Pane;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.stage.Stage;
 /**
  * 
  */
-public class Server {
+public class Server extends Application{
     public boolean stopflagraised=false;
     private static final int PORT = 12345;
-
+    String[] daysofweek={"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" , "Sunday"};
     public static void main(String[] args) {
-        new Server().startServer();
-    }
-    //sendMessageToServer(oppick+"£"+mod+"£"+pickdate.getValue()+"£"+hours.getValue()+"£"+room.getValue());
-    
-    /**
-     * 
-     * takes the information for what to add to the and checks if it clashes with anything in the csv schedule file
-     * if clash return the clash message otherwise adds it to the csvfile
-     * @param li info to be added to the module
-     * @return String clash message/done message
-     * @throws java.io.IOException 
-     */
-    public String addlecture(String[] li) throws IOException{
-     String writein=li[1]+","+li[2]+","+li[3]+","+li[4];
-     System.out.print(writein);
-    if(clashingWithOtherModule(writein)){
-    return "scedule clash!(other module is already scheduled here at this time)";
-    }
-    else if(clashingStudentHasTwoModules(writein)){
-    return "scedule clash!(Students in a module have a class at this time)";
-    }
-    else{
-    PrintWriter w=new PrintWriter(new FileWriter("src/scedule.csv",true));
-    
-    w.print(writein);
-    w.println();
-    w.close();
-    return "done";
-    }
-    }
-    /**
-     * @param writein
-     * Checks if there is already a class in this room at that time.
-     * returns true/false
-     * @return Boolean
-     */
-    public boolean clashingWithOtherModule(String writein) throws FileNotFoundException {
-    Scanner scan = new Scanner(new File("src/scedule.csv"));
-    String[] toadd = writein.split(",");
-    while (scan.hasNext()) {
-        String input = scan.nextLine();
-        String[] inschedule = input.split(",");
+       launch();
+       
         
-         if (inschedule[3].equalsIgnoreCase(toadd[3]) // room
-                   && inschedule[1].equalsIgnoreCase(toadd[1]) // date
-                   && inschedule[2].equalsIgnoreCase(toadd[2])) { // time
-            scan.close();
-             return true;
-        }
     }
-    scan.close();
-    return false;
-}
     //sendMessageToServer(oppick+"£"+mod+"£"+pickdate.getValue()+"£"+hours.getValue()+"£"+room.getValue());
-    
-    /**
-     * @param writein
-     * Checks if a student has a module at this time
-     * returns true/false
-     * @return Boolean
-     */
-    public boolean clashingStudentHasTwoModules(String writein) throws FileNotFoundException {
-    Scanner scansched = new Scanner(new File("src/scedule.csv"));
-    
-    String[] writinsplit=writein.split(",");
-    ArrayList<String> classesthattakethismodule=findClassesThatTakeThisModule(writinsplit[0]);
-    String[] Alreadyinsched;
-    while(scansched.hasNext()){
-    Alreadyinsched=scansched.nextLine().split(",");
-    if ((writinsplit[1].equalsIgnoreCase(Alreadyinsched[1]))
-    && (writinsplit[2].equalsIgnoreCase(Alreadyinsched[2])))
-    {//date and time are the same as this module
-        ArrayList<String> othermodule=findClassesThatTakeThisModule(Alreadyinsched[0]);
-        for(String s:classesthattakethismodule){
-        if(othermodule.contains(s)){
-            scansched.close();
-            return true;
-        }
-        }
+
+    private void startServer(){
+        try (ServerSocket serverSocket = new ServerSocket(PORT)) {
+            System.out.println("Server started, waiting for connections...");
+
+            while (true) {
+                Socket socket = serverSocket.accept();
+                System.out.println("Client connected!");
+
+                new handleClient(socket).start();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
-    return false;
+
+    @Override
+    public void start(Stage stage) throws Exception {
+      Pane pane=new Pane();
+     
+        GridPane schedulepane = new GridPane();
+        pane.getChildren().clear();
+        pane.getChildren().add(schedulepane);
+                        
+        Scene scene = new Scene(pane, 600, 400);
+        stage.setTitle("Server");
+        stage.setScene(scene);
+        
+        
+        Button stopsced = new Button("stop");
+        stopsced.setOnAction(event -> {
+                
+                
+                stage.close();
+            }
+        );
+        
+            
+        TextField classyear=new TextField();
+        
+        Button display = new Button("Display");
+        GridPane timetable=new GridPane();
+        
+        display.setOnAction((ActionEvent event) -> {
+        timetable.getChildren().clear();
+        if (!classyear.getText().equals("")) {
+            String schedule1;
+            try {
+            schedule1 = findschedulefordateandmod(classyear.getText());
+            System.out.println(schedule1);
+            String[] x1 = schedule1.split("!");
+            String[] nine = x1[0].split("£");
+            String[] ten = x1[1].split("£");
+            String[] eleven = x1[2].split("£");
+            String[] twelve = x1[3].split("£");
+            String[] one = x1[4].split("£");
+            String[] two = x1[5].split("£");
+            String[] three = x1[6].split("£");
+            String[] four = x1[7].split("£");
+            String[] five = x1[8].split("£");
+            for(int i2=0; i2<7; i2++){
+                Labels(timetable,daysofweek[i2], i2, 3);
+                if(!nine[i2].equalsIgnoreCase("null")){
+                    Labels(timetable,format(nine[i2]), i2, 4);}
+                else{Labels(timetable,"", i2, 4);}
+                
+                if(!ten[i2].equalsIgnoreCase("null")){
+                    Labels(timetable,format(ten[i2]), i2, 5);}
+                else{Labels(timetable,"", i2, 5);}
+                
+                if(!eleven[i2].equalsIgnoreCase("null")){
+                    Labels(timetable,format(eleven[i2]), i2, 6);}
+                else{Labels(timetable,"", i2, 6);}
+                
+                if(!twelve[i2].equalsIgnoreCase("null")){
+                    Labels(timetable,format(twelve[i2]), i2, 7);}
+                else{Labels(timetable,"", i2, 7);}
+                
+                if(!one[i2].equalsIgnoreCase("null")){
+                    Labels(timetable,format(one[i2]), i2, 8);}
+                else{Labels(timetable,"", i2, 8);}
+                
+                if(!two[i2].equalsIgnoreCase("null")){
+                    Labels(timetable,format(two[i2]), i2, 9);}
+                else{Labels(timetable,"", i2, 9);}
+                
+                if(!three[i2].equalsIgnoreCase("null")){
+                    Labels(timetable,format(three[i2]), i2, 10);}
+                else{Labels(timetable,"", i2, 10);}
+                
+                if(!four[i2].equalsIgnoreCase("null")){
+                    Labels(timetable,format(four[i2]), i2, 11);}
+                else{Labels(timetable,"", i2, 11);}
+                
+                if(!five[i2].equalsIgnoreCase("null")){
+                    Labels(timetable,format(five[i2]), i2, 12);}
+                else{Labels(timetable,"", i2, 12);}
+            }//timetable.setGridLinesVisible(true);
+        } catch (FileNotFoundException ex) {
+                Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }});
+        
+       
+
+        timetable.setMinWidth(450.0);
+        timetable.setMinHeight(200.0);
+        timetable.setPrefWidth(100.0);
+        timetable.setVgap(5); 
+        timetable.setHgap(5);
+       // timetable.setStyle("-fx-background-color: palegreen;");
+      
+        
+        
+        schedulepane.add(classyear,0,0);
+        schedulepane.add(display,1,0);
+        schedulepane.add(timetable,0,1,2,1);
+        
+        schedulepane.add(stopsced,2,2);
+        stage.show();
+        
+         new Thread(this::startServer).start();
+    }
+    public void Labels(GridPane timetable,String labelname, int columnIndex, int rowIndex) {
+            Label label = new Label();
+            String daysofweek="MondayTuesdayWednesdayThursdayFridaySaturdaySunday"; 
+            //gridPane.setColumnIndex(label, columnIndex);
+            //gridPane.setRowIndex(label, rowIndex);
+            timetable.add(label, columnIndex, rowIndex);
+            label.setId(labelname+columnIndex);
+            label.setVisible(true);
+            
+            //label.setId(null+columnIndex);
+            //System.out.print(labelname+columnIndex);
+            if(//labelname.equalsIgnoreCase("Monday")
+                  daysofweek.contains(labelname)   ){
+            label.setFont(Font.font(null, FontWeight.BOLD,14));
+            label.setText(labelname);
+            }else{
+            //label.setBackground(new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)));
+            //label.setBorder(new Border(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)));
+            label.setText(labelname);
+            label.setAlignment(Pos.CENTER);
+            }
+            //label.setBorder(new Border(new BorderStroke(Color.GREEN, BorderStrokeStyle.SOLID, null, new BorderWidths(2))));
 
     }
-    /**
-     * @param module
-     * Gets all the classes that take this module.
-     * @return  ArrayList<String>
-     * @throws java.io.FileNotFoundException
-     */
-    public ArrayList<String> findClassesThatTakeThisModule(String module) throws FileNotFoundException{
-    ArrayList<String> classesthattakethismodule=new ArrayList<>();
-    Scanner scanclassinyear = new Scanner(new File("src/classyearinmod.csv"));
-    String[] ctmoduleln;
-    while(scanclassinyear.hasNext()){
-     ctmoduleln=scanclassinyear.nextLine().split(",");
-    if(module.equalsIgnoreCase(ctmoduleln[0])){//module to be written in will equal the module in the class list
-       classesthattakethismodule.add(ctmoduleln[1]);
+/** * @param s schedule string 
+ * arranges the string to be put into the schedule
+ * @return String after it was arranged
+ * 
+ */
+    public String format(String s) {
+        String[] arrs=s.split(",");
+        String temp="";
+        if(arrs.length==4){
+        temp=arrs[2]+"\n"+arrs[0]+"\n"+arrs[3]+"\n";
+        }
+        s=temp;
+        return s;
     }
-    }
-    scanclassinyear.close();
-    return classesthattakethismodule;
-}
-       
-    public String removelecture(String[] li) throws IOException{
-    String response="couldn't find this lecture";
-    String writein=li[1]+","+li[2]+","+li[3]+","+li[4];// Lecture�CS4012�Tuesday�900�ERB001
-        ArrayList<String> temp = new ArrayList<>();
-		Scanner scedscan = new Scanner(new File("src/scedule.csv"));
-		
-		while(scedscan.hasNext()) {
-			String i = scedscan.nextLine();
-			
-			if((i).equalsIgnoreCase(writein))
-                         {
-                           response="lecture removed";
-			}
-			else {temp.add(i);}
-		}
-		PrintWriter clear = new PrintWriter("src/scedule.csv");
-		for(String x:temp) {
-			PrintWriter writer = new PrintWriter(new FileWriter("src/scedule.csv",true));
-			writer.println(x);
-			writer.close();
-        
-                }
-    scedscan.close();
-    return response;
-    }
-    
-    private String findschedulefordateandmod(String[] splitMessage) throws FileNotFoundException {
+     private String findschedulefordateandmod(String splitMessage) throws FileNotFoundException {
     //sendMessageToServer("Display Schedule"+"£"+classyear.getText());
     String[] monday=new String[9];
     String[] tuesday=new String[9];
@@ -155,7 +206,7 @@ public class Server {
     String[] sunday=new String[9];
     //String[] schedarr=new String[70];
     
-    ArrayList<String> modules=getModules(splitMessage[1]);//moduels class takes
+    ArrayList<String> modules=getModules(splitMessage);//moduels class takes
     //mod day hrs room
     int x=0;
     String Schedule="";
@@ -169,13 +220,10 @@ public class Server {
         {monday[(Integer.parseInt(CheckinScedule[2])-900)/100]=input;}
         else if(CheckinScedule[1].equalsIgnoreCase("tuesday"))
         {tuesday[(Integer.parseInt(CheckinScedule[2])-900)/100]=input;}
-        
         else if(CheckinScedule[1].equalsIgnoreCase("wednesday"))
         {wednesday[(Integer.parseInt(CheckinScedule[2])-900)/100]=input;}
-        
         else if(CheckinScedule[1].equalsIgnoreCase("thursday"))
         {thursday[(Integer.parseInt(CheckinScedule[2])-900)/100]=input;}
-        
         else if(CheckinScedule[1].equalsIgnoreCase("friday"))
         {friday[(Integer.parseInt(CheckinScedule[2])-900)/100]=input;}
         else if(CheckinScedule[1].equalsIgnoreCase("saturday"))
@@ -192,7 +240,6 @@ public class Server {
     Schedule+=tuesday[i]+"£";
     Schedule+=wednesday[i]+"£";
     Schedule+=thursday[i]+"£";
-    Schedule+=wednesday[i]+"£";
     Schedule+=friday[i]+"£";
     Schedule+=saturday[i]+"£";
     Schedule+=sunday[i]+"£";
@@ -205,81 +252,22 @@ public class Server {
     ArrayList<String> modulesinclass=new ArrayList<String>();
     Scanner scanclassinyear = new Scanner(new File("src/classyearinmod.csv"));
     String[] ctmoduleln;
+    
     while(scanclassinyear.hasNext()){
      ctmoduleln=scanclassinyear.nextLine().split(",");
+     
     if(classyear.equalsIgnoreCase(ctmoduleln[1])){//module to be written in will equal the module in the class list
        modulesinclass.add(ctmoduleln[0]);//add modules
+       
     }
     }
     scanclassinyear.close();
+    
     return modulesinclass;
 }
-    private void startServer(){
-        try (ServerSocket serverSocket = new ServerSocket(PORT)) {
-            System.out.println("Server started, waiting for connections...");
-
-            while (true&&!stopflagraised) {
-                Socket socket = serverSocket.accept();
-                System.out.println("Client connected!");
-
-                handleClient(socket);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void handleClient(Socket socket) {
-        try (
-            BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            PrintWriter writer = new PrintWriter(socket.getOutputStream(), true)
-        ) {
-            // Continuously read messages from the client
-            String message;
-            while ((message = reader.readLine()) != null) {
-                String[] splitMessage=message.split("£");
-                if(splitMessage[0].equalsIgnoreCase("stop")){
-                stopflagraised=true;
-                System.out.println("Received: " + message);
-                message="TERMINATE";
-                writer.println(message);
-                }
-                else if(splitMessage[0].equalsIgnoreCase("Add a Lecture")){
-                System.out.println("adding lecture");
-                String comfimdoness=addlecture(splitMessage);
-                writer.println(comfimdoness);
-                }
-                else if(splitMessage[0].equalsIgnoreCase("Remove a lecture")){
-                System.out.println("removing lecture");
-                String comfimdoness= removelecture(splitMessage);
-                writer.println(comfimdoness);
-                }
-                else if(splitMessage[0].equalsIgnoreCase("Display Schedule")){
-               //sendMessageToServer("Display Schedule"+"£"+module.getText()+"£"+pickdatetodiplay.getValue());
-               //splitMessage
-                String sched=findschedulefordateandmod(splitMessage);
-                writer.println(sched);
-                }
-                else {
-                    System.out.println("Received unrecognized request: " + splitMessage[0]);
-                    String errorMessage = "Error: Unsupported action requested -> " + splitMessage[0];
-
-                    writer.println(errorMessage);
-                    writer.flush();
-                    System.out.println("Sent error response to client.");
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                socket.close();
-                System.out.println("Client connection closed.");
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+  
     }
 
 
-}
+
+
