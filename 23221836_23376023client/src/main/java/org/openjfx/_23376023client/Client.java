@@ -10,7 +10,10 @@ import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
@@ -164,8 +167,7 @@ public class Client extends Application {
             }
         );
         
-        //btns.add(stoph);
-
+        
         addpane.addRow(0,modulelab ,module);
         removepane.addRow(0,modulelabr ,moduler);
 
@@ -392,14 +394,28 @@ public class Client extends Application {
         timetable.setHgap(5);
        // timetable.setStyle("-fx-background-color: palegreen;");
       
-        
-        
+        Button EarlyLect = new Button("Early lecture");
+        btns.add(EarlyLect);
+        Label EarlyLectLab=new Label("");
+        Label EarlyLectLab2=new Label("");
+        EarlyLect.setOnAction(new
+            EventHandler<ActionEvent>() {
+         @Override
+         public void handle(ActionEvent event) {
+            if(!(classyear.getText().equals(null))){
+            sendMessageToServer("EarlyLect"+"£"+classyear.getText());
+            display.fire();
+            }
+         }
+      });
         
         schedulepane.add(classyear,0,0);
         schedulepane.add(display,1,0);
         schedulepane.add(timetable,0,1,2,1);
         schedulepane.add(Homebuttons,0,2);//Homebuttons
         schedulepane.add(stopsced,2,2);
+        schedulepane.add(EarlyLect,1,2);
+        schedulepane.add(EarlyLectLab,3,2);
         GridPane.setVgrow(stopsced,javafx.scene.layout.Priority.ALWAYS);
         
         

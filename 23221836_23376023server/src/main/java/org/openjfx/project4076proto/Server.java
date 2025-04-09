@@ -7,11 +7,15 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
+import javafx.geometry.HPos;
 import javafx.geometry.Pos;
+import javafx.geometry.VPos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -80,65 +84,84 @@ public class Server extends Application{
         display.setOnAction((ActionEvent event) -> {
         timetable.getChildren().clear();
         if (!classyear.getText().equals("")) {
-            String schedule1;
-            try {
-            schedule1 = findschedulefordateandmod(classyear.getText());
-            System.out.println(schedule1);
-            String[] x1 = schedule1.split("!");
-            String[] nine = x1[0].split("£");
-            String[] ten = x1[1].split("£");
-            String[] eleven = x1[2].split("£");
-            String[] twelve = x1[3].split("£");
-            String[] one = x1[4].split("£");
-            String[] two = x1[5].split("£");
-            String[] three = x1[6].split("£");
-            String[] four = x1[7].split("£");
-            String[] five = x1[8].split("£");
-            for(int i2=0; i2<7; i2++){
-                Labels(timetable,daysofweek[i2], i2, 3);
-                if(!nine[i2].equalsIgnoreCase("null")){
-                    Labels(timetable,format(nine[i2]), i2, 4);}
-                else{Labels(timetable,"", i2, 4);}
-                
-                if(!ten[i2].equalsIgnoreCase("null")){
-                    Labels(timetable,format(ten[i2]), i2, 5);}
-                else{Labels(timetable,"", i2, 5);}
-                
-                if(!eleven[i2].equalsIgnoreCase("null")){
-                    Labels(timetable,format(eleven[i2]), i2, 6);}
-                else{Labels(timetable,"", i2, 6);}
-                
-                if(!twelve[i2].equalsIgnoreCase("null")){
-                    Labels(timetable,format(twelve[i2]), i2, 7);}
-                else{Labels(timetable,"", i2, 7);}
-                
-                if(!one[i2].equalsIgnoreCase("null")){
-                    Labels(timetable,format(one[i2]), i2, 8);}
-                else{Labels(timetable,"", i2, 8);}
-                
-                if(!two[i2].equalsIgnoreCase("null")){
-                    Labels(timetable,format(two[i2]), i2, 9);}
-                else{Labels(timetable,"", i2, 9);}
-                
-                if(!three[i2].equalsIgnoreCase("null")){
-                    Labels(timetable,format(three[i2]), i2, 10);}
-                else{Labels(timetable,"", i2, 10);}
-                
-                if(!four[i2].equalsIgnoreCase("null")){
-                    Labels(timetable,format(four[i2]), i2, 11);}
-                else{Labels(timetable,"", i2, 11);}
-                
-                if(!five[i2].equalsIgnoreCase("null")){
-                    Labels(timetable,format(five[i2]), i2, 12);}
-                else{Labels(timetable,"", i2, 12);}
-            }//timetable.setGridLinesVisible(true);
-        } catch (FileNotFoundException ex) {
-                Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            
+            //schedule1 = findschedulefordateandmod(classyear.getText());
+            Schedulecture task=new Schedulecture(classyear.getText());
+            task.setOnSucceeded((succeededEvent) -> {
+                String schedule1 =task.getValue().toString();
+                //System.out.println(schedule1);
+                String[] x1 = schedule1.split("!");
+                String[] nine = x1[0].split("£");
+                String[] ten = x1[1].split("£");
+                String[] eleven = x1[2].split("£");
+                String[] twelve = x1[3].split("£");
+                String[] one = x1[4].split("£");
+                String[] two = x1[5].split("£");
+                String[] three = x1[6].split("£");
+                String[] four = x1[7].split("£");
+                String[] five = x1[8].split("£");
+                for(int i2=0; i2<7; i2++){
+                    Labels(timetable,daysofweek[i2], i2, 3);
+                    if(!nine[i2].equalsIgnoreCase("null")){
+                        Labels(timetable,format(nine[i2]), i2, 4);}
+                    else{Labels(timetable,"", i2, 4);}
+                    
+                    if(!ten[i2].equalsIgnoreCase("null")){
+                        Labels(timetable,format(ten[i2]), i2, 5);}
+                    else{Labels(timetable,"", i2, 5);}
+                   
+                    if(!eleven[i2].equalsIgnoreCase("null")){
+                        Labels(timetable,format(eleven[i2]), i2, 6);}
+                    else{Labels(timetable,"", i2, 6);}
+                    
+                    if(!twelve[i2].equalsIgnoreCase("null")){
+                        Labels(timetable,format(twelve[i2]), i2, 7);}
+                    else{Labels(timetable,"", i2, 7);}
+                    
+                    if(!one[i2].equalsIgnoreCase("null")){
+                        Labels(timetable,format(one[i2]), i2, 8);}
+                    else{Labels(timetable,"", i2, 8);}
+                    
+                    if(!two[i2].equalsIgnoreCase("null")){
+                        Labels(timetable,format(two[i2]), i2, 9);}
+                    else{Labels(timetable,"", i2, 9);}
+                    
+                    if(!three[i2].equalsIgnoreCase("null")){
+                        Labels(timetable,format(three[i2]), i2, 10);}
+                    else{Labels(timetable,"", i2, 10);}
+                    
+                    if(!four[i2].equalsIgnoreCase("null")){
+                        Labels(timetable,format(four[i2]), i2, 11);}
+                    else{Labels(timetable,"", i2, 11);}
+                    
+                    if(!five[i2].equalsIgnoreCase("null")){
+                        Labels(timetable,format(five[i2]), i2, 12);}
+                    else{Labels(timetable,"", i2, 12);}
+                    
+                   
+                    
+                }});//timetable.setGridLinesVisible(true);
+        
+         ExecutorService executorService
+                            = Executors.newFixedThreadPool(1);
+                    executorService.execute(task);
+                    executorService.shutdown();
         }});
         
-       
+       Button earlylec=new Button("set early");
+        earlylec.setOnAction((ActionEvent event) -> {
+        System.out.println("Scheduling early lecture...");
+             if(!(classyear.getText().equals(null))){
 
+                SendEarlyTask task=new SendEarlyTask(classyear.getText());
+                 task.setOnSucceeded((succeededEvent) -> {
+                 display.fire();
+                 });
+             ExecutorService executorService
+                  = Executors.newFixedThreadPool(1);
+               executorService.execute(task);
+               executorService.shutdown();}
+        });
         timetable.setMinWidth(450.0);
         timetable.setMinHeight(200.0);
         timetable.setPrefWidth(100.0);
@@ -151,11 +174,11 @@ public class Server extends Application{
         schedulepane.add(classyear,0,0);
         schedulepane.add(display,1,0);
         schedulepane.add(timetable,0,1,2,1);
-        
-        schedulepane.add(stopsced,2,2);
+        schedulepane.add(earlylec,1,3);
+        schedulepane.add(stopsced,2,3);
         stage.show();
         
-         new Thread(this::startServer).start();
+        new Thread(this::startServer).start();
     }
     public void Labels(GridPane timetable,String labelname, int columnIndex, int rowIndex) {
             Label label = new Label();
@@ -177,6 +200,8 @@ public class Server extends Application{
             //label.setBorder(new Border(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)));
             label.setText(labelname);
             label.setAlignment(Pos.CENTER);
+            timetable.setHalignment(label, HPos.CENTER); // To align horizontally in the cell
+                timetable.setValignment(label, VPos.CENTER);
             }
             //label.setBorder(new Border(new BorderStroke(Color.GREEN, BorderStrokeStyle.SOLID, null, new BorderWidths(2))));
 
@@ -195,76 +220,8 @@ public class Server extends Application{
         s=temp;
         return s;
     }
-     private String findschedulefordateandmod(String splitMessage) throws FileNotFoundException {
-    //sendMessageToServer("Display Schedule"+"£"+classyear.getText());
-    String[] monday=new String[9];
-    String[] tuesday=new String[9];
-    String[] wednesday=new String[9];
-    String[] thursday=new String[9];
-    String[] friday=new String[9];
-    String[] saturday=new String[9];
-    String[] sunday=new String[9];
-    //String[] schedarr=new String[70];
-    
-    ArrayList<String> modules=getModules(splitMessage);//moduels class takes
-    //mod day hrs room
-    int x=0;
-    String Schedule="";
-    Scanner scedscan = new Scanner(new File("src/scedule.csv"));
-    while(scedscan.hasNext()){
-    String input=scedscan.nextLine();
-    String[] CheckinScedule=input.split(",");
-    if(modules.contains(CheckinScedule[0])){
-        //this is a module taken by this class
-        if(CheckinScedule[1].equalsIgnoreCase("monday"))
-        {monday[(Integer.parseInt(CheckinScedule[2])-900)/100]=input;}
-        else if(CheckinScedule[1].equalsIgnoreCase("tuesday"))
-        {tuesday[(Integer.parseInt(CheckinScedule[2])-900)/100]=input;}
-        else if(CheckinScedule[1].equalsIgnoreCase("wednesday"))
-        {wednesday[(Integer.parseInt(CheckinScedule[2])-900)/100]=input;}
-        else if(CheckinScedule[1].equalsIgnoreCase("thursday"))
-        {thursday[(Integer.parseInt(CheckinScedule[2])-900)/100]=input;}
-        else if(CheckinScedule[1].equalsIgnoreCase("friday"))
-        {friday[(Integer.parseInt(CheckinScedule[2])-900)/100]=input;}
-        else if(CheckinScedule[1].equalsIgnoreCase("saturday"))
-        {saturday[(Integer.parseInt(CheckinScedule[2])-900)/100]=input;}
-        else if(CheckinScedule[1].equalsIgnoreCase("sunday"))
-        {sunday[(Integer.parseInt(CheckinScedule[2])-900)/100]=input;}
-        
-    }
-    }
-    
-    for(int i=0;i<9;i++){
-    //Schedule+="!";
-    Schedule+=monday[i]+"£";
-    Schedule+=tuesday[i]+"£";
-    Schedule+=wednesday[i]+"£";
-    Schedule+=thursday[i]+"£";
-    Schedule+=friday[i]+"£";
-    Schedule+=saturday[i]+"£";
-    Schedule+=sunday[i]+"£";
-    Schedule+="!";
-    }
-    return Schedule;
-    }
-    
-    public ArrayList<String> getModules(String classyear) throws FileNotFoundException{
-    ArrayList<String> modulesinclass=new ArrayList<String>();
-    Scanner scanclassinyear = new Scanner(new File("src/classyearinmod.csv"));
-    String[] ctmoduleln;
-    
-    while(scanclassinyear.hasNext()){
-     ctmoduleln=scanclassinyear.nextLine().split(",");
-     
-    if(classyear.equalsIgnoreCase(ctmoduleln[1])){//module to be written in will equal the module in the class list
-       modulesinclass.add(ctmoduleln[0]);//add modules
-       
-    }
-    }
-    scanclassinyear.close();
-    
-    return modulesinclass;
-}
+ 
+
   
     }
 

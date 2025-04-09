@@ -1,3 +1,8 @@
-org\openjfx\project4076proto\Server.class
+org\openjfx\project4076proto\Schedulecture.class
+org\openjfx\project4076proto\sendEarly.class
 org\openjfx\project4076proto\IncorrectActionException.class
+org\openjfx\project4076proto\SendEarlyTask.class
+org\openjfx\project4076proto\addlecture.class
 org\openjfx\project4076proto\handleClient.class
+org\openjfx\project4076proto\Server.class
+org\openjfx\project4076proto\removelecture.class

@@ -1,5 +1,7 @@
 package org.openjfx.project4076proto;
 
+
+
 /**
  * Custom exception for invalid client actions.
  */
